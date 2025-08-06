@@ -20,10 +20,8 @@ app.use(
     credentials: true,
     origin: [
       process.env.NETLIFY_URL,
-      "https://cs5610-hyoungseo.netlify.app",
+      "https://a5--kaleidoscopic-moxie-c13a9a.netlify.app",
       "http://localhost:5173",
-      "http://localhost:5174",
-      "http://localhost:5175",
     ],
   })
 );
