@@ -1,75 +1,45 @@
-import "dotenv/config";
-import express from "express";
-import mongoose from "mongoose";
-import Lab5 from "./Lab5/index.js";
-import UserRoutes from "./Kambaz/Users/routes.js";
-import CourseRoutes from "./Kambaz/Courses/routes.js"; // Import CourseRoutes
-import EnrollmentRoutes from "./Kambaz/Enrollments/routes.js";
-import AssignmentRoutes from "./Kambaz/Assignments/routes.js";
-import cors from "cors";
-import session from "express-session";
-import ModuleRoutes from "./Kambaz/Modules/routes.js";
+import express from 'express';
+import Hello from './Hello.js';
+import Lab5 from './Lab5/index.js';
+import UserRoutes from './Kambaz/Users/routes.js';
+import CourseRoutes from './Kambaz/Courses/routes.js';
+import session from 'express-session';
+import cors from 'cors';
+import 'dotenv/config';
+import ModuleRoutes from './Kambaz/Modules/routes.js';
+import AssignmentRoutes from './Kambaz/Assignments/routes.js';
+import mongoose from 'mongoose';
 
-const CONNECTION_STRING = process.env.MONGO_CONNECTION_STRING || "mongodb://127.0.0.1:27017/kambaz"
-mongoose.connect(CONNECTION_STRING);
+const CONNECTION_STRING =
+  process.env.MONGO_CONNECTION_STRING || 'mongodb://192.168.1.185:27017/kambaz';
+await mongoose.connect(CONNECTION_STRING);
 const app = express();
-
-// Debug: Check what NETLIFY_URL is set to
-console.log("NETLIFY_URL environment variable:", process.env.NETLIFY_URL);
-
-// Configure CORS before session
 app.use(
   cors({
     credentials: true,
-    origin: [
-      process.env.NETLIFY_URL,
-      "https://a5--kaleidoscopic-moxie-c13a9a.netlify.app",
-    ],
+    origin: process.env.NETLIFY_URL || 'http://localhost:5173',
   })
 );
-
 const sessionOptions = {
-  secret: process.env.SESSION_SECRET || "kambaz",
+  secret: process.env.SESSION_SECRET || 'kambaz',
   resave: false,
   saveUninitialized: false,
 };
-
-// Debug: Check environment and session configuration
-console.log("NODE_ENV:", process.env.NODE_ENV);
-console.log("NODE_SERVER_DOMAIN:", process.env.NODE_SERVER_DOMAIN);
-
-if (process.env.NODE_ENV !== "development") {
+if (process.env.NODE_ENV !== 'development') {
   sessionOptions.proxy = true;
   sessionOptions.cookie = {
-    sameSite: "none",
+    sameSite: 'none',
     secure: true,
-    httpOnly: true,
-    // Don't set domain if NODE_SERVER_DOMAIN is not set
-    ...(process.env.NODE_SERVER_DOMAIN && { domain: process.env.NODE_SERVER_DOMAIN }),
-  };
-} else {
-  // Development configuration
-  sessionOptions.cookie = {
-    sameSite: "lax",
-    secure: false,
-    httpOnly: true,
+    domain: process.env.NODE_SERVER_DOMAIN,
   };
 }
-
-console.log("Session options:", sessionOptions);
-
-// Configure session before express.json
 app.use(session(sessionOptions));
 
-// Configure express.json before all routes
 app.use(express.json());
-
-// Define routes
 UserRoutes(app);
-CourseRoutes(app); // Add CourseRoutes
-EnrollmentRoutes(app);
 AssignmentRoutes(app);
+CourseRoutes(app);
 ModuleRoutes(app);
 Lab5(app);
-
-app.listen(4000); // Use fixed port 4000
+Hello(app);
+app.listen(process.env.PORT || 4000);
