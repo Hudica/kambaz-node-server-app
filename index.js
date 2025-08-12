@@ -1,5 +1,5 @@
 import express from 'express';
-import Hello from './Hello.js';
+import Hello from './hello.js';
 import Lab5 from './Lab5/index.js';
 import UserRoutes from './Kambaz/Users/routes.js';
 import CourseRoutes from './Kambaz/Courses/routes.js';
